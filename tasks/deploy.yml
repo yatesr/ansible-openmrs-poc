@@ -1,0 +1,24 @@
+- name: Copy over modules
+  synchronize:  src={{openmrs_poc_modules_dir}}/
+                dest={{openmrs_modules_dir}}/
+                archive=no
+                recursive=yes
+  notify: restart tomcat
+
+- name: Download dependent modules
+  get_url: url={{item}}
+           dest={{openmrs_modules_dir}}
+  with_items:
+   - https://modules.openmrs.org/modulus/api/releases/1053/download/xforms-4.3.0.omod
+
+- name: Copy over poc demo db
+  copy: src=openmrs-poc.sql
+        dest=/tmp/openmrs-poc.sql
+
+- name: Import poc DB
+  mysql_db: login_user={{openmrs_db_login_user}}
+            login_password={{openmrs_db_login_password}}
+            name={{openmrs_db_name}}
+            state=import
+            target=/tmp/openmrs-poc.sql
+  notify: restart tomcat

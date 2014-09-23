@@ -1,0 +1,9 @@
+---
+- include: cleanup.yml
+  when: openmrs_poc_deploy
+
+- include: deploy.yml
+  when: openmrs_poc_deploy
+
+- include: install.yml
+  when: not openmrs_poc_deploy
